@@ -1,16 +1,14 @@
-import express from 'express'
+import express from "express";
+
+//Import Routes
+import movieRoutes from './routes/movieRoutes.js'
 
 const PORT = 5000;
 const app = express();
 
-app.get("/", (req, res)=> {
-    res.json({message: "Server Running", "Avaialable Routes": "/hello"})
-})
+// API Routes
+app.use("/movies", movieRoutes)
 
-app.get("/hello", (req, res)=> {
-    res.json({message: "Hello World"})
-})
-
-const server = app.listen(PORT, ()=> {
-    console.log(`Server running on port ${PORT}`)
-})
+const server = app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
