@@ -12,9 +12,14 @@
   "type": "module",
   "description": "",
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "nodemon": "^3.1.11",
+    "prisma": "^7.3.0"
   },
   "dependencies": {
-    "express": "^5.2.1"
+    "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/client": "^7.3.0",
+    "dotenv": "^17.2.4",
+    "express": "^5.2.1",
+    "pg": "^8.18.0"
   }
 }

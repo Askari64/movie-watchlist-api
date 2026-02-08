@@ -1,16 +1,44 @@
-import express from 'express'
+import "dotenv/config";
+import express from "express";
+import { connectDB, disconnectDB } from "./config/db.js";
+
+//Import Routes
+import movieRoutes from "./routes/movieRoutes.js";
+
+connectDB();
 
 const PORT = 5000;
 const app = express();
 
-app.get("/", (req, res)=> {
-    res.json({message: "Server Running", "Avaialable Routes": "/hello"})
-})
+// API Routes
+app.use("/movies", movieRoutes);
 
-app.get("/hello", (req, res)=> {
-    res.json({message: "Hello World"})
-})
+const server = app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
-const server = app.listen(PORT, ()=> {
-    console.log(`Server running on port ${PORT}`)
-})
+// Handle Unhandled Promise Rejections
+process.on("unhandledRejection", async (error) => {
+  console.error(`Unhandled Rejection: ${error}`);
+  server.close(async () => {
+    await disconnectDB();
+    process.exit(1);
+  });
+});
+
+//Handle Uncaught Exceptions
+process.on("uncaughtException", async (error) => {
+  console.error(`Unhandled Exception: ${error}`);
+  await disconnectDB();
+  process.exit(1);
+});
+
+// Graceful Shutdown
+
+process.on("SIGTERM", async () => {
+  console.log("Terminate Signal recieved. Shutting down gracefully");
+  server.close(async () => {
+    await disconnectDB();
+    process.exit(0);
+  });
+});
