@@ -1,4 +1,5 @@
 import { prisma } from "../config/db.js";
+import bcrypt from "bcryptjs";
 
 const signup = async (req, res) => {
   const { name, email, password } = req.body;
@@ -10,11 +11,30 @@ const signup = async (req, res) => {
     return userExistsReponse(res, email);
   }
 
-  res.json({
-    message: "🟢 User signup successful",
-    name: name,
-    email: email,
-    password: password,
+  // Hash Password
+
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  // Create User
+
+  const user = await prisma.user.create({
+    data: {
+      name,
+      email,
+      password: hashedPassword,
+    },
+  });
+
+  res.status(201).json({
+    status: "success",
+    data: {
+      user: {
+        id: user.id,
+        name: name,
+        email: email,
+      },
+    },
   });
 };
 
