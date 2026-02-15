@@ -29,7 +29,31 @@ const signup = async (req, res) => {
   }
 };
 
-export { signup };
+const login = async (req, res) => {
+const {email, password} = req.body;
+
+//Check user email exists
+const user = await checkUserExists(email)
+if (!user) {
+  return userEmailDoesNotExistsReponse(res, email)
+}
+
+//verify password
+const isPasswordValid = await bcrypt.compare(password, user.password )
+if (!isPasswordValid) {
+ res.status(400).json({
+    message: "email or password incorrect"
+  })
+}
+
+//Generate JWT Token
+
+res.status(200).json({
+    message: "Login Successful"
+  })
+}
+
+export { signup, login };
 
 //********** Functions **********
 
@@ -51,6 +75,11 @@ const createUser = (name, email, hashedPassword) =>
 const userExistsReponse = (res, email) =>
   res.status(400).json({
     message: `User with email: ${email} already exists`,
+  });
+
+  const userEmailDoesNotExistsReponse = (res, email) =>
+  res.status(400).json({
+    message: `User with email: ${email} does not exist`,
   });
 
 const createUserResponse = (res, user) =>
