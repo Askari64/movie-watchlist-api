@@ -1,5 +1,6 @@
 import { prisma } from "../config/db.js";
 import bcrypt from "bcryptjs";
+import generateToken from "../utils/generateJWT.js";
 
 const signup = async (req, res) => {
   try {
@@ -47,9 +48,17 @@ if (!isPasswordValid) {
 }
 
 //Generate JWT Token
+const token = generateToken(user.id, res)
 
 res.status(200).json({
-    message: "Login Successful"
+    message: "Login Successful",
+    data: {
+      user: {
+        id: user.id,
+        email: user.email
+      },
+      token: token
+    }
   })
 }
 
