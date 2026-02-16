@@ -45,8 +45,8 @@ model WatchListItem {
   userId    String
   movieId   String
   status    WatchingStatus @default(PLANNED)
-  rating    Int
-  notes     String
+  rating    Int?
+  notes     String?
   createdAt DateTime       @default(now())
   updatedAt DateTime       @default(now())
 
@@ -55,7 +55,7 @@ model WatchListItem {
   movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
 
   // Constraint
-  @@unique([userId, movieId])
+  @@unique([userId, movieId], name: "userId_movieId")
 }
 
 enum WatchingStatus {
