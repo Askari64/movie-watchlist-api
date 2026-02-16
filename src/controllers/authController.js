@@ -52,7 +52,12 @@ const login = async (req, res) => {
   }
 };
 
-export { signup, login };
+const logout = async (req, res) => {
+  logoutUser(res);
+  logoutSuccessResponse(res);
+};
+
+export { signup, login, logout };
 
 //********** Functions **********
 
@@ -68,6 +73,12 @@ const createUser = (name, email, hashedPassword) =>
       email,
       password: hashedPassword,
     },
+  });
+
+const logoutUser = (res) =>
+  res.cookie("jwtToken", "", {
+    httpOnly: true,
+    expires: new Date(0),
   });
 //********** Responses **********
 
@@ -120,4 +131,10 @@ const loginSuccessfulResponse = (res, user, token) =>
       },
       token: token,
     },
+  });
+
+const logoutSuccessResponse = (res) =>
+  res.status(200).json({
+    status: "success",
+    message: "logged out successfully",
   });
