@@ -36,7 +36,9 @@ const addToWatchlist = async (req, res) => {
   }
 };
 
-export { addToWatchlist };
+const deleteFromWatchlist = async (req, res) => {};
+
+export { addToWatchlist, deleteFromWatchlist };
 
 // Functions
 
