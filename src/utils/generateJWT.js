@@ -6,7 +6,7 @@ const generateToken = (userId, res) => {
     expiresIn: process.env.JWT_EXPIRES || "7d",
   });
 
-  res.cookie("jwtToken", token, {
+  res.cookie("jwtAccessToken", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "Production",
     sameSite: "strict",

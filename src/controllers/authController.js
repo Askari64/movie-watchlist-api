@@ -76,7 +76,7 @@ const createUser = (name, email, hashedPassword) =>
   });
 
 const logoutUser = (res) =>
-  res.cookie("jwtToken", "", {
+  res.cookie("jwtAccessToken", "", {
     httpOnly: true,
     expires: new Date(0),
   });
