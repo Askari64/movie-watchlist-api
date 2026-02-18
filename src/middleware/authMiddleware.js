@@ -6,7 +6,7 @@ const authMiddleware = async (req, res, next) => {
 
   //Read token from request
   const authHeader = req.headers.authorization;
-  const authCookie = req.cookies.jwtAccessToken;
+  const authCookie = req.cookies?.jwtAccessToken;
 
   token =
     (authHeader?.startsWith("Bearer") ? authHeader?.split(" ")[1] : null) ??
