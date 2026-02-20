@@ -29,12 +29,10 @@ const authMiddleware = async (req, res, next) => {
       return res.status(401).json({ error: "User does not exist" });
     }
 
-
-    req.user = user.id
-    next()
-
+    req.user = user.id;
+    next();
   } catch (error) {
-    res.status(401).json({error: 'Not Authorised'})
+    res.status(401).json({ error: "Not Authorised" });
   }
 };
 
