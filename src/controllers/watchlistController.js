@@ -42,7 +42,7 @@ const deleteFromWatchlist = async (req, res) => {
 
     const watchlistItemId = req.params.id;
 
-    const watchlistItem = findWatchlistItem(watchlistItemId);
+    const watchlistItem = await findWatchlistItem(watchlistItemId);
 
     if (!watchlistItem) {
       return watchlistItemNotFoundResponse(res);
@@ -62,7 +62,46 @@ const deleteFromWatchlist = async (req, res) => {
   }
 };
 
-export { addToWatchlist, deleteFromWatchlist };
+const updateWatchlistItem = async (req, res) => {
+  try {
+    const { rating, notes, status } = req.body;
+
+    //find and verify ownership
+
+    const watchlistItemId = req.params.id;
+
+    const watchlistItem = await findWatchlistItem(watchlistItemId);
+
+    if (!watchlistItem) {
+      return watchlistItemNotFoundResponse(res);
+    }
+
+    //Ensure only user can update
+    if (watchlistItem.userId !== req.user) {
+      console.log(watchlistItem);
+      console.log(`WatchlistItem User ID: ${watchlistItem.userId}`);
+      console.log(` User ID: ${req.user}`);
+      return notAllowedToUpdateWatchlistItem(res, watchlistItem);
+    }
+
+    //Build update data
+    const updateData = {};
+    if (status !== undefined) updateData.status = status.toUpperCase();
+    if (rating !== undefined) updateData.rating = rating;
+    if (notes !== undefined) updateData.notes = notes;
+
+    const updatedItem = await updateWatchlistItemFunction(
+      watchlistItemId,
+      updateData,
+    );
+
+    updateWatchlistItemSuccessfullyResponse(res, updatedItem);
+  } catch (error) {
+    watchlistItemUpdateErrorResponse(res);
+  }
+};
+
+export { addToWatchlist, deleteFromWatchlist, updateWatchlistItem };
 
 // Functions
 
@@ -105,6 +144,13 @@ const deleteWatchlistItem = (watchlistItemId) =>
       id: watchlistItemId,
     },
   });
+
+const updateWatchlistItemFunction = (watchlistItemId, updateData) =>
+  prisma.watchListItem.update({
+    where: { id: watchlistItemId },
+    data: updateData,
+  });
+
 // Response
 
 const movieDoesNotExistResponse = (res) =>
@@ -146,10 +192,29 @@ const watchlistItemDeletedSuccessfullyResponse = (res) =>
     message: "Movie deleted successfully",
   });
 
-const watchlistItemDeletionErrorResponse = (res) => {
+const watchlistItemDeletionErrorResponse = (res) =>
   res.status(500).json({
     status: "Error",
     message:
       "Internal Server Error - Unable to delete movie from watchlist at the moment",
   });
-};
+
+const notAllowedToUpdateWatchlistItem = (res) =>
+  res.status(403).json({
+    error: "Not allowed to update this watchlist item",
+  });
+
+const updateWatchlistItemSuccessfullyResponse = (res, updatedItem) =>
+  res.status(200).json({
+    status: "success",
+    data: {
+      watchlistItem: updatedItem,
+    },
+  });
+
+const watchlistItemUpdateErrorResponse = (res) =>
+  res.status(500).json({
+    status: "Error",
+    message:
+      "Internal Server Error - Unable to update movie in watchlist at the moment",
+  });
