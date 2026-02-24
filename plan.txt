@@ -1,4 +1,0 @@
-AUTH - SignIn, SignOut
-MOVIE - Getting All Movies
-USER - Get User Profile
-WATCHLIST - Add and Remove Movies
