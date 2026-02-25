@@ -101,9 +101,30 @@ const updateWatchlistItem = async (req, res) => {
   }
 };
 
-const getWatchlistItems = async (req, res) => {}
+const getWatchlistItems = async (req, res) => {
+  try {
+    const requestingUserId = req.user;
 
-export { addToWatchlist, deleteFromWatchlist, updateWatchlistItem, getWatchlistItems };
+    //Find all the movies in watchlist by user
+
+    const allMovies = await getAllMoviesFromWatchlist(requestingUserId);
+
+    if (!allMovies) {
+      return noMovieInWatchlistResponse(res);
+    }
+
+    fetchAllMoviesFromWatchlistSuccessfullyResponse(res, allMovies);
+  } catch (error) {
+    fetchAllMoviesFromWatchlistErrorResponse(res);
+  }
+};
+
+export {
+  addToWatchlist,
+  deleteFromWatchlist,
+  updateWatchlistItem,
+  getWatchlistItems,
+};
 
 // Functions
 
@@ -151,6 +172,11 @@ const updateWatchlistItemFunction = (watchlistItemId, updateData) =>
   prisma.watchListItem.update({
     where: { id: watchlistItemId },
     data: updateData,
+  });
+
+const getAllMoviesFromWatchlist = (requestingUserId) =>
+  prisma.watchListItem.findMany({
+    where: { userId: requestingUserId },
   });
 
 // Response
@@ -219,4 +245,22 @@ const watchlistItemUpdateErrorResponse = (res) =>
     status: "Error",
     message:
       "Internal Server Error - Unable to update movie in watchlist at the moment",
+  });
+
+const noMovieInWatchlistResponse = (res) =>
+  res.status(204).json({
+    status: "error",
+    message: "No Movies in Watchlist",
+  });
+
+const fetchAllMoviesFromWatchlistSuccessfullyResponse = (res, allMovies) =>
+  res.status(200).json({
+    status: "success",
+    data: allMovies,
+  });
+
+const fetchAllMoviesFromWatchlistErrorResponse = (res) =>
+  res.status(500).json({
+    status: "error",
+    message: "Internal Server Error -  Unable to fetch watchlist",
   });
