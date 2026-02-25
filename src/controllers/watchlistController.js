@@ -101,7 +101,9 @@ const updateWatchlistItem = async (req, res) => {
   }
 };
 
-export { addToWatchlist, deleteFromWatchlist, updateWatchlistItem };
+const getWatchlistItems = async (req, res) => {}
+
+export { addToWatchlist, deleteFromWatchlist, updateWatchlistItem, getWatchlistItems };
 
 // Functions
 
