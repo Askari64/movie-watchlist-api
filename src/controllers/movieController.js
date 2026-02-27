@@ -1,12 +1,19 @@
 import { prisma } from "../config/db";
 
-const getMovies = (req, res) => {};
+const getMovies = async (req, res) => {
 
-const addMovie = (req, res) => {};
+    //TODO: Implement offset-based pagination
 
-const updateMovie = (req, res) => {};
+    
+    //List all movies
+    const allMovies = await prisma.movie.findMany()
+};
 
-const deleteMovie = (req, res) => {};
+const addMovie = async (req, res) => {};
+
+const updateMovie = async (req, res) => {};
+
+const deleteMovie = async (req, res) => {};
 
 export { getMovies, addMovie, updateMovie, deleteMovie };
 
