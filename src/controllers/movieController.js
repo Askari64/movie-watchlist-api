@@ -19,7 +19,28 @@ const getMovies = async (req, res) => {
   }
 };
 
-const addMovie = async (req, res) => {};
+const addMovie = async (req, res) => {
+  try {
+    const { title, overview, releaseYear, genres, runtime, posterURL } =
+      req.body;
+    const createdBy = req.user;
+
+    const movie = await createMovie(
+      title,
+      overview,
+      releaseYear,
+      genres,
+      runtime,
+      posterURL,
+      createdBy,
+    );
+
+    createMovieSuccessResponse(res, movie)
+
+  } catch (error) {
+    addMovieErrorResponse(res)
+  }
+};
 
 const updateMovie = async (req, res) => {};
 
@@ -38,6 +59,27 @@ const findAllMoviesAndCount = (skip, limit) =>
     }),
     prisma.movie.count(),
   ]);
+
+const createMovie = (
+  title,
+  overview,
+  releaseYear,
+  genres,
+  runtime,
+  posterURL,
+  createdBy,
+) =>
+  prisma.movie.create({
+    data: {
+      title,
+      overview,
+      releaseYear,
+      genres,
+      runtime,
+      posterURL,
+      createdBy,
+    },
+  });
 
 // Responses
 
@@ -64,3 +106,15 @@ const getAllMoviesErrorResponse = (res) =>
     status: "error",
     message: "Server Error - Can not fetch Movies",
   });
+
+
+const createMovieSuccessResponse = (res, movie) => res.status(201).json({
+        status: 'success',
+        message: 'Movie Created Successfully',
+        movie
+    })
+
+    const addMovieErrorResponse = (res) => res.status(500).json({
+        status: 'error',
+        message: 'Internal Server Error - Can not add Movie at the moment'
+    })
