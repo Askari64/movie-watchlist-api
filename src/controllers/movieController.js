@@ -35,16 +35,49 @@ const addMovie = async (req, res) => {
       createdBy,
     );
 
-    createMovieSuccessResponse(res, movie)
-
+    createMovieSuccessResponse(res, movie);
   } catch (error) {
-    addMovieErrorResponse(res)
+    addMovieErrorResponse(res);
   }
 };
 
 const updateMovie = async (req, res) => {};
 
-const deleteMovie = async (req, res) => {};
+const deleteMovie = async (req, res) => {
+  try {
+    //verify resouce exists
+
+    const movieId = req.params.id;
+    const userId = req.user;
+
+    const movieItem = await findMovieExists(movieId);
+
+    if (!movieItem) {
+      return movieNotFoundErrorResponse(res);
+    }
+
+    // verify user is resource owner
+
+    if (movieItem.createdBy !== userId) {
+      return userIsNotResourceOwnerResponse(res);
+    }
+
+    // verify movie is not in any watchlist
+
+    const movieInWatchlist = await findMovieInWatchlist(movieId);
+
+    if (movieInWatchlist) {
+      return movieInWatchlistCanNotBeDeletedResponse(res);
+    }
+
+    //delete movie
+    deleteMovieFromDatabase(movieId);
+
+    return movieDeletedSuccessfullyResponse(res);
+  } catch (error) {
+    return deleteMovieErrorResponse(res);
+  }
+};
 
 export { getMovies, addMovie, updateMovie, deleteMovie };
 
@@ -81,6 +114,22 @@ const createMovie = (
     },
   });
 
+const findMovieExists = (movieId) =>
+  prisma.movie.findFirst({
+    where: { id: movieId },
+  });
+
+const findMovieInWatchlist = (movieId) =>
+  prisma.watchListItem.findFirst({
+    where: { movieId: movieId },
+  });
+
+async function deleteMovieFromDatabase(movieId) {
+  await prisma.movie.delete({
+    where: { id: movieId },
+  });
+}
+
 // Responses
 
 const getAllMoviesSuccessResoponse = (res, movies, totalMovies, page, limit) =>
@@ -107,14 +156,45 @@ const getAllMoviesErrorResponse = (res) =>
     message: "Server Error - Can not fetch Movies",
   });
 
+const createMovieSuccessResponse = (res, movie) =>
+  res.status(201).json({
+    status: "success",
+    message: "Movie Created Successfully",
+    movie,
+  });
 
-const createMovieSuccessResponse = (res, movie) => res.status(201).json({
-        status: 'success',
-        message: 'Movie Created Successfully',
-        movie
-    })
+const addMovieErrorResponse = (res) =>
+  res.status(500).json({
+    status: "error",
+    message: "Internal Server Error - Can not add Movie at the moment",
+  });
 
-    const addMovieErrorResponse = (res) => res.status(500).json({
-        status: 'error',
-        message: 'Internal Server Error - Can not add Movie at the moment'
-    })
+const movieNotFoundErrorResponse = (res) =>
+  res.status(404).json({
+    status: "error",
+    message: "Movie not found",
+  });
+
+const userIsNotResourceOwnerResponse = (res) =>
+  res.status(401).json({
+    status: "error",
+    message: "User not authorised to delete this movie",
+  });
+
+const movieInWatchlistCanNotBeDeletedResponse = (res) =>
+  res.status(406).json({
+    status: "error",
+    message: "Movie can not be deleted due to being in Watchlist",
+  });
+
+const movieDeletedSuccessfullyResponse = (res) =>
+  res.status(200).json({
+    status: "success",
+    message: "Movie Deleted",
+  });
+
+const deleteMovieErrorResponse = (res) =>
+  res.status(500).json({
+    status: "error",
+    message: "Internal Server Error - Can not delete movie at the moment",
+  });
