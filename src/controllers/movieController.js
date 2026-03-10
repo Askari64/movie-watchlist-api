@@ -41,7 +41,43 @@ const addMovie = async (req, res) => {
   }
 };
 
-const updateMovie = async (req, res) => {};
+const updateMovie = async (req, res) => {
+  try {
+    const movieId = req.params.id;
+    const userId = req.user;
+    const { title, overview, releaseYear, genres, runtime, posterURL } =
+      req.body;
+
+    //Find and verify ownership
+
+    const movie = await findMovieExists(movieId);
+
+    if (!movie) {
+      return movieNotFoundErrorResponse(res);
+    }
+
+    if (movie.createdBy !== userId) {
+      return userIsNotResourceOwnerResponse(res);
+    }
+
+    //Build update data
+    const updateData = {};
+    if (title !== undefined) updateData.title = title;
+    if (overview !== undefined) updateData.overview = overview;
+    if (releaseYear !== undefined) updateData.releaseYear = releaseYear;
+    if (genres !== undefined) updateData.genres = genres;
+    if (runtime !== undefined) updateData.runtime = runtime;
+    if (posterURL !== undefined) updateData.posterURL = posterURL;
+
+    // update movie
+
+    const updateMovie = await updateMovieData(movieId, updateData);
+
+    return updatedMovieSuccessfullyResponse(res, updateMovie);
+  } catch (error) {
+    return updateMovieErrorResponse(res);
+  }
+};
 
 const deleteMovie = async (req, res) => {
   try {
@@ -130,6 +166,12 @@ async function deleteMovieFromDatabase(movieId) {
   });
 }
 
+const updateMovieData = (movieId, updateData) =>
+  prisma.movie.update({
+    where: { id: movieId },
+    data: updateData,
+  });
+
 // Responses
 
 const getAllMoviesSuccessResoponse = (res, movies, totalMovies, page, limit) =>
@@ -197,4 +239,18 @@ const deleteMovieErrorResponse = (res) =>
   res.status(500).json({
     status: "error",
     message: "Internal Server Error - Can not delete movie at the moment",
+  });
+
+const updateMovieErrorResponse = (res) =>
+  res.status(500).json({
+    status: "error",
+    message: "Internal Server Error -  Can not update movie at the moment",
+  });
+
+const updatedMovieSuccessfullyResponse = (res, updateMovie) =>
+  res.status(200).josn({
+    status: "success",
+    data: {
+      updatedMovieData: updateMovie,
+    },
   });
