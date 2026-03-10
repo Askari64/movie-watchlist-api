@@ -13,7 +13,7 @@ router.get("/", getMovies);
 
 router.post("/add", authMiddleware, addMovie);
 
-router.put("/:id", updateMovie);
+router.patch("/:id", updateMovie);
 
 router.delete("/:id", authMiddleware, deleteMovie);
 

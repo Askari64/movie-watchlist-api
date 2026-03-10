@@ -15,7 +15,7 @@ router.use(authMiddleware);
 
 router.post("/", validateRequest(addToWatchlistSchema), addToWatchlist);
 
-router.put("/:id", updateWatchlistItem);
+router.patch("/:id", updateWatchlistItem);
 
 router.delete("/:id", deleteFromWatchlist);
 
