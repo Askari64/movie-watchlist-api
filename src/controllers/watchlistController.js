@@ -78,9 +78,6 @@ const updateWatchlistItem = async (req, res) => {
 
     //Ensure only user can update
     if (watchlistItem.userId !== req.user) {
-      console.log(watchlistItem);
-      console.log(`WatchlistItem User ID: ${watchlistItem.userId}`);
-      console.log(` User ID: ${req.user}`);
       return notAllowedToUpdateWatchlistItem(res, watchlistItem);
     }
 
