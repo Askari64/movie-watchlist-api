@@ -9,12 +9,14 @@ import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
+router.use(authMiddleware);
+
 router.get("/", getMovies);
 
-router.post("/add", authMiddleware, addMovie);
+router.post("/add", addMovie);
 
 router.patch("/:id", updateMovie);
 
-router.delete("/:id", authMiddleware, deleteMovie);
+router.delete("/:id", deleteMovie);
 
 export default router;
