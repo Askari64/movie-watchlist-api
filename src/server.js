@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import { connectDB, disconnectDB } from "./config/db.js";
 
 //Import Routes
@@ -17,6 +18,11 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(cookieParser());
+app.use(cors({
+  origin: "http://127.0.0.1:5127"/*We will change this to frontend url */,
+  methods: ["GET", "POST", "PATCH", "DELETE"] /*Allowing only these methods */,
+  credentials: true /*Allowing cookies */,
+}))
 
 // API Routes
 app.use("/movies", movieRoutes);
