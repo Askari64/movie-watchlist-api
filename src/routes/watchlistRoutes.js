@@ -7,13 +7,13 @@ import {
 } from "../controllers/watchlistController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { validateRequest } from "../middleware/validateRequest.js";
-import { addAndUpdateToWatchlistSchema, addToWatchlistSchema } from "../validators/watchlistValidator.js";
+import { addAndUpdateToWatchlistSchema } from "../validators/watchlistValidator.js";
 
 const router = express.Router();
 
 router.use(authMiddleware);
 
-router.post("/", validateRequest(addToWatchlistSchema), addToWatchlist);
+router.post("/", validateRequest(addAndUpdateToWatchlistSchema), addToWatchlist);
 
 router.patch("/:id", validateRequest(addAndUpdateToWatchlistSchema), updateWatchlistItem);
 
