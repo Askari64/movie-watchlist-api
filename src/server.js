@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(cookieParser());
 app.use(cors({
-  origin: "http://127.0.0.1:5127"/*We will change this to frontend url */,
+  origin: "http://127.0.0.1:3000"/*We will change this to frontend url */,
   methods: ["GET", "POST", "PATCH", "DELETE"] /*Allowing only these methods */,
   credentials: true /*Allowing cookies */,
 }))
