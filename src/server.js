@@ -15,14 +15,15 @@ const PORT = 5000;
 const app = express();
 
 //Body Parsing Middlewares
-app.use(express.json());
-app.use(express.urlencoded());
-app.use(cookieParser());
 app.use(cors({
-  origin: "http://127.0.0.1:3000"/*We will change this to frontend url */,
+  origin: ["http://127.0.0.1:3000", "http://localhost:3000"]/*We will change this to frontend url */,
   methods: ["GET", "POST", "PATCH", "DELETE"] /*Allowing only these methods */,
   credentials: true /*Allowing cookies */,
 }))
+app.use(express.json());
+app.use(express.urlencoded());
+app.use(cookieParser());
+
 
 // API Routes
 app.use("/movies", movieRoutes);
