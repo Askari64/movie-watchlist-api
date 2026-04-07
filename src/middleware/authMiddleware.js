@@ -21,15 +21,17 @@ const authMiddleware = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const user = await prisma.user.findUnique({
+    // we can trust JWT for now without performing any more checks
+    /*const user = await prisma.user.findUnique({
       where: { id: decoded.id },
     });
 
     if (!user) {
       return res.status(401).json({ error: "User does not exist" });
     }
+      */
 
-    req.user = user.id;
+    req.user = decoded.id;
     next();
   } catch (error) {
     res.status(401).json({ error: "Not Authorised" });
