@@ -28,8 +28,8 @@ const addMovie = async (req, res) => {
       req.body;
     const createdBy = req.user;
 
-    // Use default if posterURL is not provided or empty
-    const finalPosterURL = posterURL?.trim() ? posterURL : DEFAULT_POSTER_URL;
+    // Use provided URL, fallback to default only if somehow missing
+    const finalPosterURL = posterURL || DEFAULT_POSTER_URL;
 
     const movie = await createMovie(
       title,
@@ -74,7 +74,7 @@ const updateMovie = async (req, res) => {
     if (genres !== undefined) updateData.genres = genres;
     if (runtime !== undefined) updateData.runtime = runtime;
     if (posterURL !== undefined) {
-      updateData.posterURL = posterURL?.trim() ? posterURL : DEFAULT_POSTER_URL;
+      updateData.posterURL = posterURL || DEFAULT_POSTER_URL;
     }
 
     // update movie
