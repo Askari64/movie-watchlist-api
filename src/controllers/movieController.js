@@ -1,5 +1,8 @@
 import { prisma } from "../config/db.js";
 
+const DEFAULT_POSTER_URL =
+  "https://cdn5.vectorstock.com/i/1000x1000/22/74/movie-poster-template-vector-16752274.jpg";
+
 const getMovies = async (req, res) => {
   try {
     //offset-based pagination
@@ -25,13 +28,16 @@ const addMovie = async (req, res) => {
       req.body;
     const createdBy = req.user;
 
+    // Use default if posterURL is not provided or empty
+    const finalPosterURL = posterURL?.trim() ? posterURL : DEFAULT_POSTER_URL;
+
     const movie = await createMovie(
       title,
       overview,
       releaseYear,
       genres,
       runtime,
-      posterURL,
+      finalPosterURL,
       createdBy,
     );
 
@@ -67,7 +73,9 @@ const updateMovie = async (req, res) => {
     if (releaseYear !== undefined) updateData.releaseYear = releaseYear;
     if (genres !== undefined) updateData.genres = genres;
     if (runtime !== undefined) updateData.runtime = runtime;
-    if (posterURL !== undefined) updateData.posterURL = posterURL;
+    if (posterURL !== undefined) {
+      updateData.posterURL = posterURL?.trim() ? posterURL : DEFAULT_POSTER_URL;
+    }
 
     // update movie
 
