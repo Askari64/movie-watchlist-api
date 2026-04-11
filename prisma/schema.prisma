@@ -31,7 +31,7 @@ model Movie {
   releaseYear Int
   genres      String[] @default([])
   runtime     Int?
-  posterURL   String?
+  posterURL   String @default("https://cdn5.vectorstock.com/i/1000x1000/22/74/movie-poster-template-vector-16752274.jpg")
   createdBy   String
   createdAt   DateTime @default(now())
 
