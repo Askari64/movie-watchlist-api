@@ -95,13 +95,7 @@ const userEmailDoesNotExistsReponse = (res, email) =>
 const createUserResponse = (res, user) =>
   res.status(201).json({
     status: "success",
-    data: {
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      },
-    },
+    message: "User created successfully",
   });
 
 const signupErrorResponse = (res) =>
