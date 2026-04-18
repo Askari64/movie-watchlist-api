@@ -168,6 +168,9 @@ const updateWatchlistItemFunction = (watchlistItemId, updateData) =>
 const getAllMoviesFromWatchlist = (requestingUserId) =>
   prisma.watchListItem.findMany({
     where: { userId: requestingUserId },
+    include: {
+      movie: true,
+    },
   });
 
 // Response
