@@ -22,6 +22,22 @@ const getMovies = async (req, res) => {
   }
 };
 
+const getMovieById = async (req, res) => {
+  try {
+    const movieId = req.params.id;
+
+    const movie = await findMovieExists(movieId);
+
+    if (!movie) {
+      return movieNotFoundErrorResponse(res);
+    }
+
+    getMovieByIdSuccessResponse(res, movie);
+  } catch (error) {
+    return getMovieByIdErrorResponse(res);
+  }
+};
+
 const addMovie = async (req, res) => {
   try {
     const { title, overview, releaseYear, genres, runtime, posterURL } =
@@ -123,7 +139,7 @@ const deleteMovie = async (req, res) => {
   }
 };
 
-export { getMovies, addMovie, updateMovie, deleteMovie };
+export { getMovies, getMovieById, addMovie, updateMovie, deleteMovie };
 
 // Functions
 
@@ -256,9 +272,21 @@ const updateMovieErrorResponse = (res) =>
   });
 
 const updatedMovieSuccessfullyResponse = (res, updateMovie) =>
-  res.status(200).josn({
+  res.status(200).json({
     status: "success",
     data: {
       updatedMovieData: updateMovie,
     },
+  });
+
+const getMovieByIdSuccessResponse = (res, movie) =>
+  res.status(200).json({
+    status: "success",
+    data: movie,
+  });
+
+const getMovieByIdErrorResponse = (res) =>
+  res.status(500).json({
+    status: "error",
+    message: "Internal Server Error - Unable to fetch movie",
   });

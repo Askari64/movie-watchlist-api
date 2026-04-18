@@ -2,6 +2,7 @@ import express from "express";
 import {
   addMovie,
   deleteMovie,
+  getMovieById,
   getMovies,
   updateMovie,
 } from "../controllers/movieController.js";
@@ -14,6 +15,8 @@ const router = express.Router();
 router.use(authMiddleware);
 
 router.get("/", getMovies);
+
+router.get("/:id", getMovieById)
 
 router.post("/add", validateRequest(addAndUpdateMovieSchema), addMovie);
 
