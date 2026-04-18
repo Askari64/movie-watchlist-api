@@ -26,8 +26,8 @@ http://localhost:5000
 *(Ensure your server is running via `npm run dev`)*
 
 **Important for Frontend Development:**
-*   **CORS** is currently configured to only accept requests from `http://127.0.0.1:3000`. You must run your frontend app on this URL or change the CORS configuration in `src/server.js`.
-*   **Authentication** is handled via HTTP-Only cookies. In your frontend `fetch` or `axios` requests, you must include `credentials: "include"` (for fetch) or `withCredentials: true` (for axios) for the `jwtAccessToken` cookie to be sent with requests.
+*   **CORS** is currently configured to accept requests from both `http://127.0.0.1:3000` and `http://localhost:3000`. You must run your frontend app on one of these URLs or change the CORS configuration in `src/server.js`.
+*   **Authentication** is handled via HTTP-only cookies. In your frontend `fetch` or `axios` requests, you must include `credentials: "include"` (for fetch) or `withCredentials: true` (for axios) for the `jwtAccessToken` cookie to be sent with requests.
 
 ---
 
@@ -46,7 +46,7 @@ Creates a new user account.
     ```json
     {
       "status": "success",
-      "data": { "user": { "id": "uuid", "name": "...", "email": "..." } }
+      "message": "User created successfully"
     }
     ```
 *   **Example Fetch Request**:
@@ -117,7 +117,7 @@ Get all movies with pagination.
 *   **Controller:** `getMovies`
 *   **Query Parameters**: 
     *   `page` (number, default: 1)
-    *   `limit` (number, default: 10)
+    *   `limit` (number, default: 50)
 *   **Success Response**: `200 OK`
     ```json
     {
@@ -172,7 +172,7 @@ Add a new movie to the global database.
 Update an existing movie details. *User must be the creator of the movie.*
 *   **Controller:** `updateMovie`
 *   **URL Params**: `id` - The movie's UUID.
-*   **Body (JSON)**: All fields passed in `POST /movies/add` are accepted but **optional**.
+*   **Body (JSON)**: Uses the same validation schema as `POST /movies/add`. Required fields are `title`, `releaseYear`, and `genres`. Optional fields are `overview`, `runtime`, and `posterURL`.
 *   **Success Response**: `200 OK`
     ```json
     {
@@ -187,7 +187,13 @@ Update an existing movie details. *User must be the creator of the movie.*
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ runtime: 148, overview: "A thief who steals corporate secrets..." })
+      body: JSON.stringify({
+        title: "Inception",
+        releaseYear: 2010,
+        genres: ["Sci-Fi", "Action"],
+        runtime: 148,
+        overview: "A thief who steals corporate secrets..."
+      })
     });
     const data = await response.json();
     ```
@@ -229,6 +235,8 @@ Gets the authenticated user's whole watchlist.
       "data": [ { /* Watchlist Item Object */ } ]
     }
     ```
+*   **Note**: If the user has no watchlist items, the current implementation returns `204`.
+
 *   **Example Fetch Request**:
     ```javascript
     const response = await fetch("http://localhost:5000/watchlist", {
@@ -244,8 +252,6 @@ Add a movie to the user's personal watchlist. Note that the frontend must provid
 *   **Body (JSON)**:
     *   `movieId` (string, UUID)
     *   `status` (enum: `"PLANNED", "WATCHING", "COMPLETED", "DROPPED"`, optional, default "PLANNED")
-    *   `rating` (integer 1-10, optional)
-    *   `notes` (string, optional)
 *   **Success Response**: `201 Created`
     ```json
     {
@@ -261,21 +267,18 @@ Add a movie to the user's personal watchlist. Note that the frontend must provid
       credentials: "include",
       body: JSON.stringify({ 
         movieId: "existing-movie-uuid", 
-        status: "WATCHING",
-        rating: 8
+        status: "WATCHING"
       })
     });
     const data = await response.json();
     ```
 
 ### `PATCH /watchlist/:id`
-Updates a user's logged details for a watchlist item (status, rating, notes).
+Updates a watchlist item's status.
 *   **Controller:** `updateWatchlistItem`
-*   **URL Params**: `id` - The Watchlist Item's UUID (not the underlying movie ID).
+*   **URL Params**: `id` - The Watchlist Item's UUID.
 *   **Body (JSON)**:
-    *   `status` (enum: `"PLANNED", "WATCHING", "COMPLETED", "DROPPED"`, optional)
-    *   `rating` (integer 1-10, optional)
-    *   `notes` (string, optional)
+    *   `status` (enum: `"PLANNED", "WATCHING", "COMPLETED", "DROPPED"`)
 *   **Success Response**: `200 OK`
     ```json
     {
@@ -290,7 +293,7 @@ Updates a user's logged details for a watchlist item (status, rating, notes).
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ status: "COMPLETED", rating: 10, notes: "Masterpiece!" })
+      body: JSON.stringify({ status: "COMPLETED" })
     });
     const data = await response.json();
     ```
@@ -323,4 +326,4 @@ Removes an entry from the user's watchlist.
 ### User Context & Prisma Schema Models Overview
 *   **User**: `id`, `name`, `email`, `password`, `createdAt`
 *   **Movie**: `id`, `title`, `overview`, `releaseYear`, `genres`, `runtime`, `posterURL`, `createdBy`
-*   **WatchlistItem**: `id`, `userId`, `movieId`, `status`, `rating`, `notes`, `createdAt`, `updatedAt`
+*   **WatchlistItem**: `id`, `userId`, `movieId`, `status`, `createdAt`, `updatedAt`
