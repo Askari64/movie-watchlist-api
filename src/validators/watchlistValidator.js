@@ -1,7 +1,7 @@
 import z from "zod";
 
 const addAndUpdateToWatchlistSchema = z.object({
-  movieId: z.string().uuid(),
+  movieId: z.string().uuid().optional(),
   status: z
     .enum(["PLANNED", "WATCHING", "COMPLETED", "DROPPED"], {
       error: () => ({
