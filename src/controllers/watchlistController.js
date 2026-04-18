@@ -2,7 +2,7 @@ import { prisma } from "../config/db.js";
 
 const addToWatchlist = async (req, res) => {
   try {
-    const { movieId, status, rating, notes } = req.body;
+    const { movieId, status } = req.body;
     const userId = req.user;
 
     // Verify movie exists
@@ -25,9 +25,7 @@ const addToWatchlist = async (req, res) => {
     const watchlistItem = await createWatchlistItem(
       movieId,
       userId,
-      status,
-      rating,
-      notes,
+      status
     );
 
     return watchlistItemCreationSuccessResponse(res, watchlistItem);
@@ -64,7 +62,7 @@ const deleteFromWatchlist = async (req, res) => {
 
 const updateWatchlistItem = async (req, res) => {
   try {
-    const { rating, notes, status } = req.body;
+    const { status } = req.body;
 
     //find and verify ownership
 
@@ -84,8 +82,6 @@ const updateWatchlistItem = async (req, res) => {
     //Build update data
     const updateData = {};
     if (status !== undefined) updateData.status = status.toUpperCase();
-    if (rating !== undefined) updateData.rating = rating;
-    if (notes !== undefined) updateData.notes = notes;
 
     const updatedItem = await updateWatchlistItemFunction(
       watchlistItemId,
@@ -142,14 +138,12 @@ const verifyMovieExistsInWatchlist = (movieId, userId) =>
     },
   });
 
-const createWatchlistItem = (movieId, userId, status, rating, notes) =>
+const createWatchlistItem = (movieId, userId, status) =>
   prisma.watchListItem.create({
     data: {
       movieId,
       userId,
       status: status || "PLANNED",
-      rating,
-      notes,
     },
   });
 
