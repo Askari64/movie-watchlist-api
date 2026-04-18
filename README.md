@@ -135,6 +135,27 @@ Get all movies with pagination.
     const data = await response.json();
     ```
 
+### `GET /movies/:id`
+Get a specific movie by its ID.
+*   **Controller:** `getMovieById`
+*   **URL Params**: `id` - The movie's UUID.
+*   **Success Response**: `200 OK`
+    ```json
+    {
+      "status": "success",
+      "data": { /* Movie Object */ }
+    }
+    ```
+*   **Example Fetch Request**:
+    ```javascript
+    const movieId = "your-movie-uuid";
+    const response = await fetch(`http://localhost:5000/movies/${movieId}`, {
+      method: "GET",
+      credentials: "include"
+    });
+    const data = await response.json();
+    ```
+
 ### `POST /movies/add`
 Add a new movie to the global database.
 *   **Controller:** `addMovie`
@@ -325,5 +346,5 @@ Removes an entry from the user's watchlist.
 
 ### User Context & Prisma Schema Models Overview
 *   **User**: `id`, `name`, `email`, `password`, `createdAt`
-*   **Movie**: `id`, `title`, `overview`, `releaseYear`, `genres`, `runtime`, `posterURL`, `createdBy`
+*   **Movie**: `id`, `title`, `overview`, `releaseYear`, `genres`, `runtime`, `posterURL`, `createdBy`, `createdAt`
 *   **WatchlistItem**: `id`, `userId`, `movieId`, `status`, `createdAt`, `updatedAt`
